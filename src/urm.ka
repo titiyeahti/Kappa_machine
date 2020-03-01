@@ -1,0 +1,35 @@
+/*
+%var: 1024 1024			
+%var: 2147483647 4294967296			//2^32
+%var: 1024 1024
+%var: 'max_size' max(1024, 1024)
+*/
+
+/* M is modeling the memory :
+ * prev and next are links to form a sequence;
+ * id is this id of the memory slot;
+ * val is the value stored in the slot
+ */ 
+%agent: M(prev[M.next], next[M.prev], id{= 0 / += 1024}, val{=0 / += 2147483647})
+
+/* I is modeling the instruction sequence :
+ * prev and next are site to form a sequence;
+ * id is  the id if the instr in the program;
+ * instr is giving the type of instruction either zero(i), incr(i), swap(i, j) or goto(i, j, k);
+ * target1 and 2 are the argument of the instructions;
+ * dest is used to store k in case of goto;
+ * TODO: think about the goto
+ */
+%agent: I(prev[I.next], next[I.prev], id{= 0 / += 1024}, instr{z i s g}, 
+target1{=0 / += 1024}, target2{=0 / += 1024}, dest{=0 / += 1024})
+
+/* H is modeling the processor reading instrution and altering memory :
+ * it is linked to a mem slot and a instruction;
+ * val is a slot to store a value (needed for goto and swap)
+ * target is used to store the targeted instr or mem slot for goto or swap
+ */
+%agent: H(mem[M.id], instr[I.id], state{w m s1 s2 g}, 
+val{=0 / += 2147483647}, dest{= 0 / += 1024})
+
+
+
