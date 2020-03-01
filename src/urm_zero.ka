@@ -1,0 +1,102 @@
+%var: 'k' 1
+
+/* -------------------------------------------------------------------------- */
+/* COMMON                                                                     */
+/* -------------------------------------------------------------------------- */
+
+/* reading an instruction -> moving state for the head */
+H(instr[1], state{w}), I(id[1]) -> H(instr[1], state{m}), I(id[1]) @ 'k'
+
+/* moving to the spot */
+/* moving forward */
+'m-fwd' H(mem[2], instr[1], state{m}), I(id[1], target1{=tg}), 
+M(next[3], id{< 'tg'}[2/.]), M(prev[3], id[./2]) @ 'k'
+
+/* moving backward */
+'m-bwd' H(mem[2], instr[1], state{m}), I(id[1], target1{=tg}), 
+M(prev[3], id{> 'tg'}[2/.]), M(next[3], id[./2]) @ 'k'
+
+/* -------------------------------------------------------------------------- */
+/* Zero and Incr                                                              */
+/* -------------------------------------------------------------------------- */
+
+/* Execution z and incr
+ * If the instr is either i or z and we are on the good spot
+ * 1°) we modify the value in the memory slot;
+ * 2°) we advance to the next instruction;
+ * 3°) we return to wainting state 
+ */
+'exec-z' H(mem[2], instr[1], state{m/w}), I(next[3], id[1/.], target1{=tg}, instr{z}), 
+I(prev[3], id[./1]), M(id{='tg'}[2], val{/ = 0}) @ 'k'
+
+'exec-incr' H(mem[2], instr[1], state{m/w}), I(next[3], id[1/.], target1{=tg}, instr{i}), 
+I(prev[3], id[./1]), M(id{='tg'}[2], val{/ += 1}) @ 'k'
+
+/* -------------------------------------------------------------------------- */
+/* Goto and Swap                                                              */
+/* -------------------------------------------------------------------------- */
+
+/* Going into s1 mode */
+'s1-s' I(id[1], target1{=tg}, instr{s}), M(id{='tg'}[2], val{=v}), 
+H(mem[2], instr[1], state{m/s1}, val{/ ='v'}) @ 'k'
+'s1-gt' I(id[1], target1{=tg}, instr{g}), M(id{='tg'}[2], val{=v}), 
+H(mem[2], instr[1], state{m/s1}, val{/ ='v'}) @ 'k'
+
+/* Seeking j */
+/* moving forward */
+'s1-fwd' H(mem[2], instr[1], state{s1}), I(id[1], target2{=tg}), 
+M(next[3], id{< 'tg'}[2/.]), M(prev[3], id[./2]) @ 'k'
+
+/* moving backward */
+'s1-bwd' H(mem[2], instr[1], state{s1}), I(id[1], target2{=tg}), 
+M(prev[3], id{> 'tg'}[2/.]), M(next[3], id[./2]) @ 'k'
+
+/* -------------------------------------------------------------------------- */
+/* SWAP                                                                       */
+/* -------------------------------------------------------------------------- */
+
+/* Store the value of i in j */
+'s2' I(id[1], target2{=tg}, instr{s}), M(id{='tg'}[2], val{=vj/ ='vi'}), 
+H(mem[2], instr[1], state{s1/s2}, val{=vi/ ='vj'}) @ 'k'
+
+/* Come back to i */
+/* moving forward */
+'s2-fwd' H(mem[2], instr[1], state{s2}), I(id[1], target1{=tg}), 
+M(next[3], id{< 'tg'}[2/.]), M(prev[3], id[./2]) @ 'k'
+
+/* moving backward */
+'s2-bwd' H(mem[2], instr[1], state{s2}), I(id[1], target1{=tg}), 
+M(prev[3], id{> 'tg'}[2/.]), M(next[3], id[./2]) @ 'k'
+
+/* last swap */
+'exec-s' H(mem[2], instr[1], state{s2/w}, val{=vj}), 
+I(next[3], id[1/.], target1{=tg}, instr{z}), 
+I(prev[3], id[./1]), M(id{='tg'}[2], val{/ = 'vj'}) @ 'k'
+
+/* -------------------------------------------------------------------------- */
+/* GOTO                                                                       */
+/* -------------------------------------------------------------------------- */
+
+/* mem[i] != mem[j] -> instruction suivante */
+'exec-goto-fail' H(mem[2], instr[1], state{s1/w}, val{=vi}), 
+I(next[3], id[1/.], target2{=tg}, instr{z}), I(prev[3], id[./1]), 
+M(id{='tg'}[2], val{!= 'vi'}) @ 'k'
+
+/* mem[i] == mem[j] -> instruction dest */
+ 
+'exec-goto-success' I(id[1/.], target2{=tg}, instr{z}, dest{=d}),
+H(mem[2], instr[1], state{s1/g}, val{=vi}, dest{/ = 'd'}), 
+M(id{='tg'}[2], val{= 'vi'}) @ 'k'
+
+/* find instr dest */
+/* moving forward */
+'instr-fwd' H(instr[1], state{g}, dest{=d}), 
+I(next[2], id{< 'd'}[1/.]), I(prev[2], id[./1]) @ 'k'
+
+/* moving backward */
+'instr-bwd' H(instr[1], state{g}, dest{=d}), 
+I(prev[2], id{> 'd'}[1/.]), I(next[2], id[./1]) @ 'k'
+
+/* return into waiting mode */
+'goto-arrived' H(instr[1], state{g/w}, dest{=d}), I(id{= 'd'}[1]) @ 'k'
+

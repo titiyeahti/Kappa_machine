@@ -13,7 +13,12 @@ f = open("urm.ka", "r")
 model = f.read()
 f.close()
 
+f = open("urm_zero.ka", "r")
+rules = f.read()
+f.close()
+
 client.add_model_string(model)
+client.add_model_string(rules)
 client.project_parse()
 
 
