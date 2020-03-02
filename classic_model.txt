@@ -1,0 +1,125 @@
+/* C is modeling the cells of the tape of the Turing machine :
+ * prev and next are link to form a sequence
+ * main is a boolean indicating if the cell is attached or not to the tape
+	* 0 is not main
+	* 1 is main
+ * com is a site that will communicate with the head on the tape
+ * val is the value stored in the cell (I choose the value to be 0 or 1 but it can be changed)
+ * sig is a value that contains the information of the move of the head (left, right, no instruction) 
+	* -1 is for no signal
+	* 0 is left
+	* 1 is right
+ *it is passed to the adjacent cell to trigger the move
+ * shine is a value signalling when this cell is the new site on which the head will bind (the cell shines or does not shine)
+	* 0 is not shine
+	* 1 is shine
+*/
+%agent: C(prev[next.C], next[prev.C], com[com_tape.H], main{=0 / +=1}, val{=0 / +=1}, sig{=-1 / +=1}, shine{=0 / +=1})
+
+
+
+/* H is modeling the head which move on the tape :
+ * com_tape is the link to the tape. 
+ * com_aut is the link to the automata.
+ * must_read contains a boolean indicating if the value on the tape must be read or not
+	* 0 is must not read
+	* 1 is must read
+ * read contains the value read on the tape, there will be a special character to indicate that nothing is already read
+	(* -1 is nothing read)
+	* 0 is read 0
+	* 1 is read 1
+ * write contains the value that has to be written on the tape
+	* -1 is nothing to write
+	* 0 is write 0
+	* 1 is write 1
+ * dep contains a value that indicates to the head in which direction it should move (left, right, no move, a special character "I have no instruction")
+	* -1 is no instruction/no move
+	* 0 is left
+	* 1 is right
+ * (maybe we should add other indicators)
+*/
+%agent: H(com_tape[com.C], com_aut[com.S com.T], must_read{=0 / +=1}, read{=-1 / +=1}, write{=-1 / +1}, dep{=-1 / +1})
+
+
+
+/* S is modelling a particular state of the automata :
+ * prev1, ..., prevn  (need of at most n transitions where n is the nb of states, but we can choose to put just as much as we need)
+ * next0 and next1 are the two transitions departing from this states (considering that the alphabet have 2 letters, there are two transitions departing from each state)
+ * com is the link to the head
+ * id is the identifier of the node (will be useful during the construction of the automaton, during initialization)
+ * shine is a value signalling when this state is the new one on which the head will bind.
+	* 0 is not shine
+	* 1 is shine
+ * read is the value received by the state from the head that will trigger the move to a transition 
+	* -1 is nothing read
+	* 0 is read 0
+	* 1 is read 1
+*/ 
+%agent: S(prev1[next.T], prev2[next.T], prev3[next.T], prev4[next.T], prev5[next.T], prev6[next.T], next0[prev.T], next1[prev.T], com[com_aut.H], id{=0 / +=1024}, shine{=0 / +=1}, read{=-1 / +=1})
+
+
+
+/* T is modelling a transition between two states of the automata :
+ * prev and next are the two links to the previous and next states
+ * com is the link to the head
+ * write contains the value that must be written on the tape
+	* 0 is write 0
+	* 1 is write 1
+ * dep contains the deplacement of the head on the tape 
+	* -1 is no move
+	* 0 is left
+	* 1 is right
+ * shine is the value signalling when this transition is the new one on which the head will bind.
+	* 0 is not shine
+	* 1 is shine
+*/
+%agent: T(prev[next0.S, next1.S], next[prev1.S prev2.S prev3.S prev4.S prev5.S prev6.S], com[com_aut.H], write{=0 / +=1}, dep{=-1 / +=1}, shine{=0 / +=1})
+
+
+
+
+/* tape rules */
+
+'elongation of the tape by the right' C(prev[.], main[1]), C(next[.], main[0]) -> C(prev[42], main[1]), C(next[42], main[1]) @ 1
+'elongation of the tape by the left' C(prev[.], main[0]), C(next[.], main[1]) -> C([prev[42], main[1]), C(next[42], main[1]) @ 1
+
+'pass move cell to cell 1' C(next[42], sig[0]), C(prev[42], shine[0]) -> C(next[42], sig[-1]), C(prev[42], shine[1]) @ 1
+'pass move cell to cell 2' C(prev[42], sig[1]), C(next[42], shine[0]) -> C(prev[42], sig[-1]), C(next[42], shine[1]) @ 1
+
+/* head + tape rules */
+
+'move head tape' H(com_tape[42]), C(com[42]), C(com[.], shine[1]) -> H(com_tape[42]), C(com[.]), C(com[42], shine[0]) @ 1
+
+'write 0' H(com_tape[42], write[0]), C(com[42], val[#]) -> H(com_tape[42], write[-1]), C(com[42], val[0]) @1
+'write 1' H(com_tape[42], write[1]), C(com[42], val[#]) -> H(com_tape[42], write[-1]), C(com[42], val[1]) @1
+
+'pass move head to cell 1' H(com_tape[42], dep[0]), C(com[42], sig[#]) -> H(com_tape[42], dep[-1]), C(com[42], sig[0]) @ 1
+'pass move head to cell 2' H(com_tape[42], dep[1]), C(com[42], sig[#]) -> H(com_tape[42], dep[-1]), C(com[42], sig[1]) @ 1
+
+'read 0' H(com_tape[42], must_read[1], read[#]), C(com[42], val[0]) -> H(com_tape[42], must_read[0], read[0]), C(com[42], val[0]) @ 1
+'read 1' H(com_tape[42], must_read[1], read[#]), C(com[42], val[1]) -> H(com_tape[42], must_read[0], read[1]), C(com[42], val[1]) @ 1 
+
+
+/* automaton + head rules*/
+'ask reading' H(com_aut[42], must_read[0]), S(com[42], shine[1]) -> H(com_aut[42], must_read[1]), S(com[42], shine[0]) @ 1
+
+'move head state' H(com_aut[42]), T(com[42]), S(com[.], shine[1]) ->  H(com_aut[42]), T(com[.]), S(com[42], shine[1]) @ 1
+'move head transition' H(com_aut[42]), S(com[42]), T(com[.], shine[1]) -> H(com_aut[42]), S(com[.]), T(com[42], shine[1]) @ 1
+
+'take read value 0' H(com_aut[42], must_read[0], read[0]), S(com[42], read[-1]) -> H(com_aut[42], must_read[0], read[0]), S(com[42], read[0]) @ 1
+'take read value 1' H(com_aut[42], must_read[0], read[1]), S(com[42], read[-1]) -> H(com_aut[42], must_read[0], read[1]), S(com[42], read[1]) @ 1
+
+'state to transition 0' S(read[0], next0[42]), T(prev[42], shine[0]) -> S(read[-1], next0[42]), T(prev[42], shine[1]) @ 1
+'state to transition 1' S(read[1], next0[42]), T(prev[42], shine[0]) -> S(read[-1], next0[42]), T(prev[42], shine[1]) @ 1
+
+'write value 0 + no deplacement' H(com_aut[42], write[-1]), T(com[42], write[0]) -> H(com_aut[42], write[0]), T(com[42], write[0]) @ 1
+'write value 1 + no deplacement' H(com_aut[42], write[-1]), T(com[42], write[1]) -> H(com_aut[42], write[1]), T(com[42], write[1]) @ 1
+'write value 0 + deplacement left' H(com_aut[42], write[-1], dep[-1]), T(com[42], write[0], dep[0]) -> H(com_aut[42], write[0], dep[0]), T(com[42], write[0], dep[0]) @ 1
+'write value 1 + deplacement left' H(com_aut[42], write[-1], dep[-1]), T(com[42], write[1], dep[0]) -> H(com_aut[42], write[1], dep[0]), T(com[42], write[1], dep[0]) @ 1
+'write value 0 + deplacement right' H(com_aut[42], write[-1], dep[-1]), T(com[42], write[0], dep[1]) -> H(com_aut[42], write[0], dep[1]), T(com[42], write[0], dep[1]) @ 1
+'write value 1 + deplacement right' H(com_aut[42], write[-1], dep[-1]), T(com[42], write[1], dep[1]) -> H(com_aut[42], write[1], dep[1]), T(com[42], write[1], dep[1]) @ 1
+
+
+/* Initialization : To be done, according to a specified program for the Turing machine */
+
+
