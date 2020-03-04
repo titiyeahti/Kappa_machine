@@ -1,0 +1,9 @@
+%var: 'k-plug' 1000
+
+/* RULES */
+/* tape */
+'plug-to-prev' C(prev[./1], main{m}), C(next[./1], main{o/m}) @ 'k-plug'
+'plug-to-next' C(next[./1], main{m}), C(prev[./1], main{o/m}) @ 'k-plug'
+
+/*
+
