@@ -60,62 +60,65 @@ int main ( int argc, char *argv[] )
 				}
 
 				int link_id = 1;
-				int mem_value, n ,q;
+				int m, n ,q;
 				char val, dep;
-
-				if((fscanf ( input, "%d", &mem_value )) != 1)
+				
+				if((fscanf ( input, "%d %d", &n, &m )) != 2)
 				{
 								fprintf ( stderr, "incorrect first line in '%s'\n",
 																input_file_name);
 								exit (EXIT_FAILURE);
 				}
 				
-				if((fscanf ( input, "%d", &n )) != 1)
+				int i, j, pos;
+				char graph[n*n*6];
+				
+				int nb_pred[n];
+				int links[9*n];
+
+				fprintf(output, 
+				"%%init: %d C(val{s}, main{o}, start{o})\n",
+				MEM_SIZE);
+
+
+				/*  TAPE INIT */
+
+				char mem[m+1];
+				if((fscanf ( input, "%s", mem)) != 1)
 				{
 								fprintf ( stderr, "incorrect second line in '%s'\n",
 																input_file_name);
 								exit (EXIT_FAILURE);
 				}
 
-				fprintf(output, 
-				"%%init: %d C(val{t}, main{o}, start{o}), C(val{f}, main{o}, start{o})\n",
-				MEM_SIZE);
+				printf("%s", mem);
 
-				/*  TAPE INIT */
+				fprintf(output, "%%init: 1\n");	
 
-				fprintf(output, "%%init: 1\n");
-
-				q = mem_value % 2;
-				val = q ? 't' : 'f' ;
-				mem_value /= 2;
-
-				if(mem_value == 0)
-								fprintf( output, "C(main{m}, start{s}, com[%d], val{%c}),\n", 
-																link_id, val);
-				else
-								fprintf( output, "C(main{m}, start{o}, prev[%d], val{%c}),\n", 
-																link_id, val);
-
-				link_id ++;
-
-				while(mem_value > 0)
+				if(m==1)
 				{
-								q = mem_value % 2;
-								val = q ? 't' : 'f';
-								mem_value /= 2;
-
-								if(mem_value == 0)
-												fprintf( output,
-												"C(main{m}, start{s}, com[%d], next[%d], val{%c}),\n", 
-																				link_id, link_id-1, val);
-								else
-												fprintf( output, 
-												"C(main{m}, start{o}, prev[%d], next[%d], val{%c}),\n", 
-																				link_id, link_id-1, val);
-
-								link_id ++;
+								fprintf(output, "C(main{m}, start{s}, com{%d}, val{%c}),\n",
+																m, mem[0]);
+								link_id = 1;
 				}
-				
+				else
+				{
+								fprintf(output, "C(main{m}, start{s}, prev[%d], val{%c}),\n",
+																1, mem[m-1]);
+
+								for(i = 2; i < m; i++)
+								{
+												fprintf(output,
+												"C(main{m}, start{s}, prev[%d], next[%d], val{%c}),\n",
+																				i, i-1, mem[m-i]);
+								}
+
+								fprintf(output, 
+								"C(main{m}, start{s}, com{%d}, next{%d}, val{%c}),\n",
+																m, m-1, mem[0]);
+
+								link_id = m;
+				}
 				/* HEAD */
 
 				fprintf(output, "H(com_aut[%d], com_tape[%d]),\n", link_id, link_id-1);
@@ -125,17 +128,15 @@ int main ( int argc, char *argv[] )
 
 				/* Contruction of graph
 				 * an adjacency representation of the input automata 
-				 		* graph + 4*(i*n + j) : transitions from i to j
+				 		* graph + 6*(i*n + j) : transitions from i to j
 						* the 2 first slots are for the FALSE transion 
 						* and the two others for the TRUE one (value to write + dep)*/
-				int i, j, pos;
-				char graph[n*n*4];
 
 				/* graph - INIT */
-				for(i=0; i < n*n*4; i++) {graph[i] = 0;};
+				for(i=0; i < n*n*6; i++) {graph[i] = 0;};
 
 				/* graph - CONSTRUCT */
-				for(i=0; i<2*n; i++)
+				for(i=0; i<3*n; i++)
 				{
 								if(fscanf(input, "%d %c %c",&j ,&val, &dep) != 3)
 								{
@@ -148,17 +149,15 @@ int main ( int argc, char *argv[] )
 								/* +2(i%2) is to select the good transition
 								 * if i even -> false transiton
 								 * else -> true tansition */
-								pos = 4*(n*(i/2) + j) + 2*(i%2);
+								pos = 6*(n*(i/3) + j) + 2*(i%3);
 								
 								graph[pos] = val;
 								graph[pos+1] = dep;
 				}
 
-				int nb_pred[n];
-				int links[8*n];
 				int g_link_id = link_id + 1; /* memorize the com link from the head */
 
-				for(i=0; i < n*8; i++) {links[i] = 0;};
+				for(i=0; i < n*9; i++) {links[i] = 0;};
 				for(i=0; i < n; i++) {nb_pred[i] = 0;};
 
 				for(i=0; i<n; i++)
@@ -167,7 +166,7 @@ int main ( int argc, char *argv[] )
 								for(j=0; j<n; j++)
 								{
 												/* The FALSE transition */
-												if(graph[4*(n*i+j)])
+												if(graph[6*(n*i+j)])
 												{
 																if(nb_pred[j] >= 6)
 																{
@@ -176,8 +175,8 @@ int main ( int argc, char *argv[] )
 																				j, input_file_name);
 																				exit (EXIT_FAILURE);
 																}
-																links[8*i] = g_link_id;
-																links[8*j + 2 + nb_pred[j]] = g_link_id + 1;
+																links[9*i] = g_link_id;
+																links[9*j + 3 + nb_pred[j]] = g_link_id + 1;
 
 																nb_pred[j] ++;
 																g_link_id += 2;
@@ -185,7 +184,7 @@ int main ( int argc, char *argv[] )
 																count ++;
 												}
 												/* The TRUE transition */
-												if(graph[4*(n*i+j)+2])
+												if(graph[6*(n*i+j)+2])
 												{
 																if(nb_pred[j] >= 6)
 																{
@@ -195,8 +194,27 @@ int main ( int argc, char *argv[] )
 																				exit (EXIT_FAILURE);
 																}
 
-																links[8*i + 1] = g_link_id;
-																links[8*j + 2 + nb_pred[j]] = g_link_id + 1;
+																links[9*i + 1] = g_link_id;
+																links[9*j + 3 + nb_pred[j]] = g_link_id + 1;
+
+																nb_pred[j] ++;
+																g_link_id += 2;
+
+																count ++;
+												}
+												/* The SEP transition */
+												if(graph[6*(n*i+j)+4])
+												{
+																if(nb_pred[j] >= 6)
+																{
+																				fprintf ( stderr, 
+																				"too much pred for %d in '%s'\n",
+																				j, input_file_name);
+																				exit (EXIT_FAILURE);
+																}
+
+																links[9*i + 2] = g_link_id;
+																links[9*j + 3 + nb_pred[j]] = g_link_id + 1;
 
 																nb_pred[j] ++;
 																g_link_id += 2;
@@ -204,7 +222,7 @@ int main ( int argc, char *argv[] )
 																count ++;
 												}
 
-												if(count == 2)
+												if(count == 3)
 																break;
 								}
 				}
@@ -213,47 +231,63 @@ int main ( int argc, char *argv[] )
 
 				for(i=0; i<n; i++)
 				{
+								int id = 9*i;
+
 								fprintf(output, "S(");
-								for(j=2; j<8; j++)
+								for(j=3; j<9; j++)
 								{
-												if(links[8*i+j])
+												if(links[id+j])
 																fprintf(output, "prev%d[%d], ",
-																							 	j-1, links[8*i+j]);
+																							 	j-1, links[id+j]);
 								}
+
+
 								if(i==0)
-												fprintf(output, "next0[%d], next1[%d], com[%d]),\n",
-																				links[8*i], links[8*i+1], link_id);
+												fprintf(output, "next0[%d], next1[%d], next2[%d] com[%d]),\n",
+																				links[id], links[id+1], links[id+2], link_id);
 								else 
-												fprintf(output, "next0[%d], next1[%d]),\n",
-																				links[8*i], links[8*i+1]);
+												fprintf(output, "next0[%d], next1[%d], next2[%d]),\n",
+																				links[id], links[id+1], links[id+2]);
 								
 								int count =0;
 								for(j=0; j<n; j++)
 								{
+												int idg = 6*(i*n+j);
 												/* The FALSE transition */
-												if(graph[4*(n*i+j)])
+												if(graph[idg])
 												{
 																fprintf(output,
 																"T(prev[%d], next[%d], write{%c}, dep{%c})",
-																links[8*i], links[8*i] + 1, 
-																graph[4*(n*i+j)], graph[4*(n*i+j) + 1]);
+																links[id], links[id] + 1, 
+																graph[idg], graph[idg + 1]);
 																count ++;
-																if( i != (n-1) || count < 2)
+																if( i != (n-1) || count < 3)
 																				fprintf(output, ",\n");
 												}
 												/* The TRUE transition */
-												if(graph[4*(n*i+j)+2])
+												if(graph[idg+2])
 												{
 																fprintf(output,
 																"T(prev[%d], next[%d], write{%c}, dep{%c})",
-																links[8*i+1], links[8*i+1] + 1, 
-																graph[4*(n*i+j) + 2], graph[4*(n*i+j) + 3]);
+																links[id+1], links[id+1] + 1, 
+																graph[idg + 2], graph[idg + 3]);
 																count ++;
-																if( i != (n-1) || count < 2)
+																if( i != (n-1) || count < 3)
+																				fprintf(output, ",\n");
+												}
+												/* The SEP transition */
+												if(graph[idg+4])
+												{
+																fprintf(output,
+																"T(prev[%d], next[%d], write{%c}, dep{%c})",
+																links[id+2], links[id+2] + 1, 
+																graph[idg + 4], graph[idg + 5]);
+																count ++;
+																if( i != (n-1) || count < 3)
 																				fprintf(output, ",\n");
 												}
 
-												if(count == 2)
+												if(count == 3)
 																break;
 								}
 				}
