@@ -38,7 +38,7 @@ We also wrote a parser to compile a turing machine description (writen in a synt
 This describe the syntax of the input files for the parser :
 ```
 N M  // N = Number of states, M = Size of initial memory 
-
+{t f s}^M
 [0-n] {t f s} {l r n}  // transition avec f (FALSE) from 0
 [0-n] {t f s} {l r n}  // transition avec t (TRUE) from 0
 [0-n] {t f s} {l r n}  // transition with s (SEP) from 0
