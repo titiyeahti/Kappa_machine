@@ -91,8 +91,6 @@ int main ( int argc, char *argv[] )
 								exit (EXIT_FAILURE);
 				}
 
-				printf("%s", mem);
-
 				fprintf(output, "%%init: 1\n");	
 
 				if(m==1)
@@ -238,7 +236,7 @@ int main ( int argc, char *argv[] )
 								{
 												if(links[id+j])
 																fprintf(output, "prev%d[%d], ",
-																							 	j-1, links[id+j]);
+																							 	j-2, links[id+j]);
 								}
 
 
