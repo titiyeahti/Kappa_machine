@@ -42,7 +42,7 @@ int main ( int argc, char *argv[] )
 				else 
 				{
 								input_file_name = "input/base_test";
-								output_file_name = "output/base_test";
+								output_file_name = "output/base_test.ka";
 				}
 
 
@@ -106,7 +106,7 @@ int main ( int argc, char *argv[] )
 
 								if(mem_value == 0)
 												fprintf( output,
-												"C(main{m}, start{s}, com[%d], prev[%d], val{%c}),\n", 
+												"C(main{m}, start{s}, com[%d], next[%d], val{%c}),\n", 
 																				link_id, link_id-1, val);
 								else
 												fprintf( output, 
@@ -119,6 +119,7 @@ int main ( int argc, char *argv[] )
 				/* HEAD */
 
 				fprintf(output, "H(com_aut[%d], com_tape[%d]),\n", link_id, link_id-1);
+				
 
 				/* AUTOMATA */
 
@@ -209,22 +210,53 @@ int main ( int argc, char *argv[] )
 				}
 
 				/* Writing the states */
-				/* Not first */
 
-
-				/* First one */
-				fprintf(output, "S(");
-				for(j=2; j<8; i++)
+				for(i=0; i<n; i++)
 				{
-								if(links[j])
-												fprintf(output, "prev%d[%d], ", j-1, links[j]);
+								fprintf(output, "S(");
+								for(j=2; j<8; j++)
+								{
+												if(links[8*i+j])
+																fprintf(output, "prev%d[%d], ",
+																							 	j-1, links[8*i+j]);
+								}
+								if(i==0)
+												fprintf(output, "next0[%d], next1[%d], com[%d]),\n",
+																				links[8*i], links[8*i+1], link_id);
+								else 
+												fprintf(output, "next0[%d], next1[%d]),\n",
+																				links[8*i], links[8*i+1]);
+								
+								int count =0;
+								for(j=0; j<n; j++)
+								{
+												/* The FALSE transition */
+												if(graph[4*(n*i+j)])
+												{
+																fprintf(output,
+																"T(prev[%d], next[%d], write{%c}, dep{%c})",
+																links[8*i], links[8*i] + 1, 
+																graph[4*(n*i+j)], graph[4*(n*i+j) + 1]);
+																count ++;
+																if( i != (n-1) || count < 2)
+																				fprintf(output, ",\n");
+												}
+												/* The TRUE transition */
+												if(graph[4*(n*i+j)+2])
+												{
+																fprintf(output,
+																"T(prev[%d], next[%d], write{%c}, dep{%c})",
+																links[8*i+1], links[8*i+1] + 1, 
+																graph[4*(n*i+j) + 2], graph[4*(n*i+j) + 3]);
+																count ++;
+																if( i != (n-1) || count < 2)
+																				fprintf(output, ",\n");
+												}
+
+												if(count == 2)
+																break;
+								}
 				}
-				fprintf(output, "next0[%d], next1[%d], com[%d])\n"
-											 links[0], links[1], link_id);
-
-				/* TODO THE REST of the states */
-
-				/* Writing the transitions */
 
 				if( fclose(input) == EOF ) {			/* close input file   */
 								fprintf ( stderr, "couldn't close file '%s'; %s\n",
