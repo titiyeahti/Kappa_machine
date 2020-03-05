@@ -1,0 +1,8 @@
+tfttffs
+2
+0 t r //false
+0 f r //true
+1 s n //sep
+1 f n
+1 t n
+1 s n

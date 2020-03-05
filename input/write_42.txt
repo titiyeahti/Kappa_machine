@@ -1,0 +1,23 @@
+0
+7
+1 t r
+1 t r
+1 t r
+2 f r
+2 f r
+2 f r
+3 t r
+3 t r
+3 t r
+4 f r
+4 f r
+4 f r
+5 t r
+5 t r 
+5 t r
+6 f r
+6 f r
+6 f r
+7 s n
+7 s n
+7 s n
