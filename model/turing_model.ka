@@ -6,8 +6,8 @@
 	* main (m : it is the main tape, o : it isn't)
 	* start (s : it is the start cell, o : it isn't)
 */
-%agent: C(prev[next.C], next[prev.C], com[com_tape.H], main{s m o}, 
-val{t f}, start{s o})
+%agent: C(prev[next.C], next[prev.C], com[com_tape.H], main{m o}, 
+val{t f s}, start{s o})
 
 
 /* HEAD : the mighty cell witch is running the program */
@@ -21,12 +21,12 @@ val{t f}, start{s o})
 /* AUTOMATA : the automata representing the program */
 /* S : a state
 	* prev[1-6], links to transition leading to this state
-	* next[0/1], links to the transitions when a f/v is read
+	* next[0/1/2], links to the transitions when a f/t/s is read
 	* com, a link the head
 */
 %agent: S(prev1[next.T], prev2[next.T], prev3[next.T], 
 prev4[next.T], prev5[next.T], prev6[next.T], 
-next0[prev.T], next1[prev.T], com[com_aut.H])
+next0[prev.T], next1[prev.T], next2[prev.T], com[com_aut.H])
 
 /* T : a transition
 	* prev, link to the previous state
@@ -34,9 +34,9 @@ next0[prev.T], next1[prev.T], com[com_aut.H])
 	* write, the value to write before moving
 	* dep, the moving instruction (l : LEFT, r : RIGHT, n : NO_MOVE)
 */
-%agent: T(prev[next0.S next1.S], 
+%agent: T(prev[next0.S next1.S next2.S], 
 next[prev1.S prev2.S prev3.S prev4.S prev5.S prev6.S],
-com[com_aut.H], write{t f}, dep{l r n})
+com[com_aut.H], write{t f s}, dep{l r n})
 
 
 
