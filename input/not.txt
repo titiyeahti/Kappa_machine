@@ -1,5 +1,5 @@
+2 7
 tfttffs
-2
 0 t r //false
 0 f r //true
 1 s n //sep
