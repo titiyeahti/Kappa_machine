@@ -15,9 +15,15 @@ To construct our turing machine we relied on 4 different agents:
 	- Connected with at most two others cells (double linked list);
 	- The lecture head is connected to the current cell during the computations.
 - H, lecture head :
-	- Connected with the tape and the automaton;
+	- Connected with the current cell of the tape and the atual state / transition in the automaton;
 	- It is the central agent of the model.
 - S, state of the automaton
+	- **CONSTANT** number of previous transition (actually 6);
+	- 3 outgoing transition (one for each symbol (TRUE FALSE SEP);
+	- The current state is connected wit the head.
+- T, transtion in the autmaton
+	- Between 2 states
+	- Contains the instrution to be done when the head arrives on it : what to write, where to go.
 
 ### Code
 The code of the model is stored in two distinct files:
