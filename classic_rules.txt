@@ -1,9 +1,238 @@
 %var: 'k-plug' 1000
+%var: 'k-read' 10
+%var: 'k-write' 10
 
 /* RULES */
 /* tape */
 'plug-to-prev' C(prev[./1], main{m}), C(next[./1], main{o/m}) @ 'k-plug'
 'plug-to-next' C(next[./1], main{m}), C(prev[./1], main{o/m}) @ 'k-plug'
 
-/*
+/* READ THE TAPE (from state to transisiton) */
+'read-TRUE' C(main{m}, com[1], val{v}), H(com_tape[1], com_taut[2]),
+S(next1[3], com[2/.]), T(prev[3], com[./2]) @ 'k-read'
 
+'read-FALSE' C(main{m}, com[1], val{f}), H(com_tape[1], com_taut[2]),
+S(next2[3], com[2/.]), T(prev[3], com[./2]) @ 'k-read'
+
+/* TRANSITIONS (unfortunatly it will be 6 times the right numbre of rules)*/
+/* The idea here is to write to apply a transition, to do so,
+	* 1) match the good kind of transitions
+	* 2) write the new value in the tape
+	* 3) move on the tape (if needed)
+	* 4) go to the next state
+*/
+ 
+/* ################################################################################ */
+/* 														PREV 1 																							  */
+/* ################################################################################ */
+/* Write FALSE */
+'write-FALSE-left' C(prev[1], main{m}, com[2/.], val{_/f}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{l}),
+S(prev1[4], com[./3]) @ 'k-write'
+ 
+'write-FALSE-right' C(rext[1], main{m}, com[2/.], val{_/f}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{r}),
+S(prev1[4], com[./3]) @ 'k-write'
+
+'write-FALSE-no-move' C(main{m}, com[2], val{_/f}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{n}),
+S(prev1[4], com[./3]) @ 'k-write'
+
+/* Write TRUE */
+'write-TRUE-left' C(prev[1], main{m}, com[2/.], val{_/t}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{l}),
+S(prev1[4], com[./3]) @ 'k-write'
+ 
+'write-TRUE-right' C(rext[1], main{m}, com[2/.], val{_/t}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{r}),
+S(prev1[4], com[./3]) @ 'k-write'
+
+'write-TRUE-no-move' C(main{m}, com[2], val{_/t}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{n}),
+S(prev1[4], com[./3]) @ 'k-write'
+
+
+/* ################################################################################ */
+/* 														PREV 2 																							  */
+/* ################################################################################ */
+/* Write FALSE */
+'write-FALSE-left' C(prev[1], main{m}, com[2/.], val{_/f}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{l}),
+S(prev2[4], com[./3]) @ 'k-write'
+ 
+'write-FALSE-right' C(rext[1], main{m}, com[2/.], val{_/f}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{r}),
+S(prev2[4], com[./3]) @ 'k-write'
+
+'write-FALSE-no-move' C(main{m}, com[2], val{_/f}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{n}),
+S(prev2[4], com[./3]) @ 'k-write'
+
+/* Write TRUE */
+'write-TRUE-left' C(prev[1], main{m}, com[2/.], val{_/t}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{l}),
+S(prev2[4], com[./3]) @ 'k-write'
+ 
+'write-TRUE-right' C(rext[1], main{m}, com[2/.], val{_/t}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{r}),
+S(prev2[4], com[./3]) @ 'k-write'
+
+'write-TRUE-no-move' C(main{m}, com[2], val{_/t}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{n}),
+S(prev2[4], com[./3]) @ 'k-write'
+
+
+/* ################################################################################ */
+/* 														PREV 3 																							  */
+/* ################################################################################ */
+/* Write FALSE */
+'write-FALSE-left' C(prev[1], main{m}, com[2/.], val{_/f}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{l}),
+S(prev3[4], com[./3]) @ 'k-write'
+ 
+'write-FALSE-right' C(rext[1], main{m}, com[2/.], val{_/f}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{r}),
+S(prev3[4], com[./3]) @ 'k-write'
+
+'write-FALSE-no-move' C(main{m}, com[2], val{_/f}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{n}),
+S(prev3[4], com[./3]) @ 'k-write'
+
+/* Write TRUE */
+'write-TRUE-left' C(prev[1], main{m}, com[2/.], val{_/t}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{l}),
+S(prev3[4], com[./3]) @ 'k-write'
+ 
+'write-TRUE-right' C(rext[1], main{m}, com[2/.], val{_/t}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{r}),
+S(prev3[4], com[./3]) @ 'k-write'
+
+'write-TRUE-no-move' C(main{m}, com[2], val{_/t}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{n}),
+S(prev3[4], com[./3]) @ 'k-write'
+
+
+/* ################################################################################ */
+/* 														PREV 4 																							  */
+/* ################################################################################ */
+/* Write FALSE */
+'write-FALSE-left' C(prev[1], main{m}, com[2/.], val{_/f}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{l}),
+S(prev4[4], com[./3]) @ 'k-write'
+ 
+'write-FALSE-right' C(rext[1], main{m}, com[2/.], val{_/f}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{r}),
+S(prev4[4], com[./3]) @ 'k-write'
+
+'write-FALSE-no-move' C(main{m}, com[2], val{_/f}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{n}),
+S(prev4[4], com[./3]) @ 'k-write'
+
+/* Write TRUE */
+'write-TRUE-left' C(prev[1], main{m}, com[2/.], val{_/t}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{l}),
+S(prev4[4], com[./3]) @ 'k-write'
+ 
+'write-TRUE-right' C(rext[1], main{m}, com[2/.], val{_/t}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{r}),
+S(prev4[4], com[./3]) @ 'k-write'
+
+'write-TRUE-no-move' C(main{m}, com[2], val{_/t}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{n}),
+S(prev4[4], com[./3]) @ 'k-write'
+
+
+/* ################################################################################ */
+/* 														PREV 5 																							  */
+/* ################################################################################ */
+/* Write FALSE */
+'write-FALSE-left' C(prev[1], main{m}, com[2/.], val{_/f}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{l}),
+S(prev5[4], com[./3]) @ 'k-write'
+ 
+'write-FALSE-right' C(rext[1], main{m}, com[2/.], val{_/f}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{r}),
+S(prev5[4], com[./3]) @ 'k-write'
+
+'write-FALSE-no-move' C(main{m}, com[2], val{_/f}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{n}),
+S(prev5[4], com[./3]) @ 'k-write'
+
+/* Write TRUE */
+'write-TRUE-left' C(prev[1], main{m}, com[2/.], val{_/t}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{l}),
+S(prev5[4], com[./3]) @ 'k-write'
+ 
+'write-TRUE-right' C(rext[1], main{m}, com[2/.], val{_/t}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{r}),
+S(prev5[4], com[./3]) @ 'k-write'
+
+'write-TRUE-no-move' C(main{m}, com[2], val{_/t}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{n}),
+S(prev5[4], com[./3]) @ 'k-write'
+
+
+/* ################################################################################ */
+/* 														PREV 6 																							  */
+/* ################################################################################ */
+/* Write FALSE */
+'write-FALSE-left' C(prev[1], main{m}, com[2/.], val{_/f}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{l}),
+S(prev6[4], com[./3]) @ 'k-write'
+ 
+'write-FALSE-right' C(rext[1], main{m}, com[2/.], val{_/f}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{r}),
+S(prev6[4], com[./3]) @ 'k-write'
+
+'write-FALSE-no-move' C(main{m}, com[2], val{_/f}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{f}, dep{n}),
+S(prev6[4], com[./3]) @ 'k-write'
+
+/* Write TRUE */
+'write-TRUE-left' C(prev[1], main{m}, com[2/.], val{_/t}), 
+C(next[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{l}),
+S(prev6[4], com[./3]) @ 'k-write'
+ 
+'write-TRUE-right' C(rext[1], main{m}, com[2/.], val{_/t}), 
+C(prev[1], main{m}, com[./2]), H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{r}),
+S(prev6[4], com[./3]) @ 'k-write'
+
+'write-TRUE-no-move' C(main{m}, com[2], val{_/t}), 
+H(com_tape[2], com_aut[3]), 
+T(next[4], com[3/.], write{t}, dep{n}),
+S(prev6[4], com[./3]) @ 'k-write'

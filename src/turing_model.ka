@@ -1,0 +1,43 @@
+/* TAPE : were bits are stored */
+/* C : tape cells
+	* link to previous and next cells;
+	* link to the head;
+	* val (t fot TRUE, f for FALSE)
+	* main (m : it is the main tape, o : it isn't)
+	* start (s : it is the start cell, o : it isn't)
+*/
+%agent: C(prev[next.C], next[prev.C], com[com_tape.H], main{s m o}, 
+val{t f}, start{s o})
+
+
+/* HEAD : the mighty cell witch is running the program */
+/* H : the head
+	* link to the current cell tape
+	* link to the actual position in the automata
+*/
+%agent: H(com_tape[com.C], com_aut[com.S com.T])
+
+
+/* AUTOMATA : the automata representing the program */
+/* S : a state
+	* prev[1-6], links to transition leading to this state
+	* next[0/1], links to the transitions when a f/v is read
+	* com, a link the head
+*/
+%agent: S(prev1[next.T], prev2[next.T], prev3[next.T], 
+prev4[next.T], prev5[next.T], prev6[next.T], 
+next0[prev.T], next1[prev.T], com[com_aut.H])
+
+/* T : a transition
+	* prev, link to the previous state
+	* next, link to the next state
+	* write, the value to write before moving
+	* dep, the moving instruction (l : LEFT, r : RIGHT, n : NO_MOVE)
+*/
+%agent: T(prev[next0.S next1.S], 
+next[prev1.S prev2.S prev3.S prev4.S prev5.S prev6.S],
+com[com_aut.H], write{t f}, dep{l r n})
+
+
+
+

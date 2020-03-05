@@ -9,16 +9,22 @@ path_to_agent = p_thibaut
 client = kappy.KappaStd(path_to_agent)
 
 #choice of model
-f = open("urm.ka", "r")
+f = open("turing_model.ka", "r")
 model = f.read()
 f.close()
 
-f = open("urm_zero.ka", "r")
+f = open("turing_rules.ka", "r")
 rules = f.read()
+f.close()
+
+
+f = open("turing_init_test.ka", "r")
+init = f.read()
 f.close()
 
 client.add_model_string(model)
 client.add_model_string(rules)
+client.add_model_string(init)
 client.project_parse()
 
 

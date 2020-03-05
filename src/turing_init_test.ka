@@ -1,0 +1,6 @@
+%init: 1024 C(val{t}, main{o}, start{o}), C(val{f}, main{o}, start{o})
+%init: 1 S(prev1[1], prev2[2], next0[3], next1[4], com[5]), 
+H(com_aut[5], com_tape[6]), 
+C(val{t}, com[6], main{m}, start{s}), 
+T(prev[3], next[1], write{t}, dep{n}, com[.]),
+T(prev[4], next[2], write{t}, dep{n}, com[.])

@@ -21,6 +21,8 @@
 /* S is modelling a particular state of the automata :
  * prev1, ..., prevn  (need of at most n transitions where n is the nb of states, but we can choose to put just as much as we need)
  * next0 and next1 are the two transitions departing from this states (considering that the alphabet have 2 letters, there are two transitions departing from each state)
+	* next0 is when we read false (f)
+	* next1 is for true
  * com is the link to the head
  * id is the identifier of the node (will be useful during the construction of the automaton, during initialization)
  * Shine
@@ -46,7 +48,7 @@ next0[T.prev], next1[T.prev], com[H.com_aut], shine{s u})
  * shine (s) if it shines u otherwise.
 */
 %agent: T(prev[S.next0 S.next1], next[S.prev1 S.prev2 S.prev3 S.prev4 S.prev5 S.prev6],
-com[H.com_aut], write{t f}, dep{l r}, shine{s u})
+com[H.com_aut], write{t f}, dep{l r n}, shine{s u})
 
 
 
