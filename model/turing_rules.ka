@@ -9,11 +9,15 @@
 'm-plug-to-next' C(next[./1], main{m}), C(prev[./1], main{o/m}) @ 'k-plug'
 
 /* READ THE TAPE (from state to transisiton) */
-'read-TRUE' C(main{m}, com[1], val{t}), H(com_tape[1], com_aut[2/4]),
-S(next1[3], com[2/.]), T(prev[3], com[./4]) @ 'k-read'
 
 'read-FALSE' C(main{m}, com[1], val{f}), H(com_tape[1], com_aut[2/4]),
 S(next0[3], com[2/.]), T(prev[3], com[./4]) @ 'k-read'
+
+'read-TRUE' C(main{m}, com[1], val{t}), H(com_tape[1], com_aut[2/4]),
+S(next1[3], com[2/.]), T(prev[3], com[./4]) @ 'k-read'
+
+'read-SEP' C(main{m}, com[1], val{s}), H(com_tape[1], com_aut[2/4]),
+S(next2[3], com[2/.]), T(prev[3], com[./4]) @ 'k-read'
 
 /* EXECUTE TRANSITION (from transisiton to state */
 /* (unfortunatly it will be 6 times the right numbre of rules)*/
@@ -59,6 +63,22 @@ H(com_tape[2], com_aut[3/5]),
 T(next[4], com[3/.], write{t}, dep{n}),
 S(prev1[4], com[./5]) @ 'k-write'
 
+/* Write SEP */
+'1-write-SEP-left' C(prev[1], main{m}, com[2/.], val{#/s}), 
+C(next[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{l}),
+S(prev1[4], com[./5]) @ 'k-write'
+ 
+'1-write-SEP-right' C(next[1], main{m}, com[2/.], val{#/s}), 
+C(prev[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{r}),
+S(prev1[4], com[./5]) @ 'k-write'
+
+'1-write-SEP-no-move' C(main{m}, com[2], val{#/s}), 
+H(com_tape[2], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{n}),
+S(prev1[4], com[./5]) @ 'k-write'
+
 
 /* ################################################################################ */
 /* 														PREV 2 																							  */
@@ -95,6 +115,21 @@ H(com_tape[2], com_aut[3/5]),
 T(next[4], com[3/.], write{t}, dep{n}),
 S(prev2[4], com[./5]) @ 'k-write'
 
+/* Write SEP */
+'2-write-SEP-left' C(prev[1], main{m}, com[2/.], val{#/s}), 
+C(next[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{l}),
+S(prev2[4], com[./5]) @ 'k-write'
+ 
+'2-write-SEP-right' C(next[1], main{m}, com[2/.], val{#/s}), 
+C(prev[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{r}),
+S(prev2[4], com[./5]) @ 'k-write'
+
+'2-write-SEP-no-move' C(main{m}, com[2], val{#/s}), 
+H(com_tape[2], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{n}),
+S(prev2[4], com[./5]) @ 'k-write'
 
 /* ################################################################################ */
 /* 														PREV 3 																							  */
@@ -129,6 +164,22 @@ S(prev3[4], com[./5]) @ 'k-write'
 '3-write-TRUE-no-move' C(main{m}, com[2], val{#/t}), 
 H(com_tape[2], com_aut[3/5]), 
 T(next[4], com[3/.], write{t}, dep{n}),
+S(prev3[4], com[./5]) @ 'k-write'
+
+/* Write SEP */
+'3-write-SEP-left' C(prev[1], main{m}, com[2/.], val{#/s}), 
+C(next[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{l}),
+S(prev3[4], com[./5]) @ 'k-write'
+ 
+'3-write-SEP-right' C(next[1], main{m}, com[2/.], val{#/s}), 
+C(prev[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{r}),
+S(prev3[4], com[./5]) @ 'k-write'
+
+'3-write-SEP-no-move' C(main{m}, com[2], val{#/s}), 
+H(com_tape[2], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{n}),
 S(prev3[4], com[./5]) @ 'k-write'
 
 
@@ -167,6 +218,21 @@ H(com_tape[2], com_aut[3/5]),
 T(next[4], com[3/.], write{t}, dep{n}),
 S(prev4[4], com[./5]) @ 'k-write'
 
+/* Write SEP */
+'4-write-SEP-left' C(prev[1], main{m}, com[2/.], val{#/s}), 
+C(next[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{l}),
+S(prev4[4], com[./5]) @ 'k-write'
+ 
+'4-write-SEP-right' C(next[1], main{m}, com[2/.], val{#/s}), 
+C(prev[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{r}),
+S(prev4[4], com[./5]) @ 'k-write'
+
+'4-write-SEP-no-move' C(main{m}, com[2], val{#/s}), 
+H(com_tape[2], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{n}),
+S(prev4[4], com[./5]) @ 'k-write'
 
 /* ################################################################################ */
 /* 														PREV 5 																							  */
@@ -203,6 +269,22 @@ H(com_tape[2], com_aut[3/5]),
 T(next[4], com[3/.], write{t}, dep{n}),
 S(prev5[4], com[./5]) @ 'k-write'
 
+/* Write SEP */
+'5-write-SEP-left' C(prev[1], main{m}, com[2/.], val{#/s}), 
+C(next[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{l}),
+S(prev5[4], com[./5]) @ 'k-write'
+ 
+'5-write-SEP-right' C(next[1], main{m}, com[2/.], val{#/s}), 
+C(prev[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{r}),
+S(prev5[4], com[./5]) @ 'k-write'
+
+'5-write-SEP-no-move' C(main{m}, com[2], val{#/s}), 
+H(com_tape[2], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{n}),
+S(prev5[4], com[./5]) @ 'k-write'
+
 
 /* ################################################################################ */
 /* 														PREV 6 																							  */
@@ -237,4 +319,20 @@ S(prev6[4], com[./5]) @ 'k-write'
 '6-write-TRUE-no-move' C(main{m}, com[2], val{#/t}), 
 H(com_tape[2], com_aut[3/5]), 
 T(next[4], com[3/.], write{t}, dep{n}),
+S(prev6[4], com[./5]) @ 'k-write'
+
+/* Write SEP */
+'6-write-SEP-left' C(prev[1], main{m}, com[2/.], val{#/s}), 
+C(next[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{l}),
+S(prev6[4], com[./5]) @ 'k-write'
+ 
+'6-write-SEP-right' C(next[1], main{m}, com[2/.], val{#/s}), 
+C(prev[1], main{m}, com[./6]), H(com_tape[2/6], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{r}),
+S(prev6[4], com[./5]) @ 'k-write'
+
+'6-write-SEP-no-move' C(main{m}, com[2], val{#/s}), 
+H(com_tape[2], com_aut[3/5]), 
+T(next[4], com[3/.], write{s}, dep{n}),
 S(prev6[4], com[./5]) @ 'k-write'
