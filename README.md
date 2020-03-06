@@ -39,8 +39,8 @@ This describe the syntax of the input files for the parser :
 ```
 N M  // N = Number of states, M = Size of initial memory 
 {t f s}^M
-[0-n] {t f s} {l r n}  // transition avec f (FALSE) from 0
-[0-n] {t f s} {l r n}  // transition avec t (TRUE) from 0
+[0-n] {t f s} {l r n}  // transition with f (FALSE) from 0
+[0-n] {t f s} {l r n}  // transition with t (TRUE) from 0
 [0-n] {t f s} {l r n}  // transition with s (SEP) from 0
 ...
 [0-n] {t f s} {l r n}  // transition with f (FALSE) from N-1

@@ -1,0 +1,18 @@
+%init: 1024 C(val{s}, main{o}, start{o})
+%init: 1
+C(main{m}, start{s}, prev[1], val{s}),
+C(main{m}, start{s}, prev[2], next[1], val{f}),
+C(main{m}, start{s}, prev[3], next[2], val{f}),
+C(main{m}, start{s}, prev[4], next[3], val{t}),
+C(main{m}, start{s}, prev[5], next[4], val{t}),
+C(main{m}, start{s}, prev[6], next[5], val{f}),
+C(main{m}, start{s}, com{7}, next{6}, val{t}),
+H(com_aut[7], com_tape[6]),
+S(prev1[9], prev2[11], next0[8], next1[10], next2[12] com[7]),
+T(prev[8], next[9], write{t}, dep{r}),
+T(prev[10], next[11], write{f}, dep{r}),
+T(prev[12], next[13], write{s}, dep{n}),
+S(prev1[13], prev2[15], prev3[17], prev4[19], next0[14], next1[16], next2[18]),
+T(prev[14], next[15], write{f}, dep{n}),
+T(prev[16], next[17], write{t}, dep{n}),
+T(prev[18], next[19], write{s}, dep{n})

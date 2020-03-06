@@ -1,8 +1,8 @@
 2 7
 tfttffs
-0 t r //false
-0 f r //true
-1 s n //sep
+0 t r
+0 f r
+1 s n
 1 f n
 1 t n
 1 s n
